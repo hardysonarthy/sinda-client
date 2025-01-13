@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:sinda/views/request/main.dart';
-import 'package:sinda/views/request/partial.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sinda/views/collections/bloc/collections_bloc.dart';
+import 'package:sinda/views/collections/main.dart';
+import 'package:sinda/views/collections/partial.dart';
 import 'package:sinda/widgets/sidebar.dart';
 
 void main() {
@@ -44,7 +46,11 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Row(
+        body: MultiBlocProvider(
+      providers: [
+        BlocProvider<CollectionsBloc>(create: (_) => CollectionsBloc())
+      ],
+      child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
@@ -64,7 +70,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
               flex: 9,
               child: Column(children: [
                 SizedBox(
-                    height: 32,
+                    height: 50,
                     child: TabBar(
                         controller: mainTabController,
                         tabAlignment: TabAlignment.start,
@@ -90,6 +96,6 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
               ]))
         ],
       ),
-    );
+    ));
   }
 }

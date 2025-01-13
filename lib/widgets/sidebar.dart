@@ -1,6 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:sinda/constants/sidebar_items.dart';
 
+class SidebarButton extends StatelessWidget {
+  final String title;
+  final IconData icon;
+  final Function? onTap;
+
+  const SidebarButton(
+      {super.key, required this.title, required this.icon, this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox.expand(
+        child: Tooltip(
+            message: title,
+            child: InkWell(
+              onTap: () => onTap,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(icon),
+                ],
+              ),
+            )));
+  }
+}
+
 class Sidebar extends StatelessWidget {
   const Sidebar({super.key});
 
@@ -16,35 +42,15 @@ class Sidebar extends StatelessWidget {
             padding: EdgeInsets.symmetric(horizontal: 2),
             itemBuilder: (context, index) {
               final item = sidebarItems[index];
-              return SizedBox.expand(
-                  child: Tooltip(
-                      message: item.title,
-                      child: InkWell(
-                        onTap: () => {},
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              item.icon,
-                            ),
-                          ],
-                        ),
-                      )));
+              return SidebarButton(title: item.title, icon: item.icon);
             },
           )),
           SizedBox(
               height: 48,
-              child: Tooltip(
-                  message: 'Login',
-                  child:
-                      IconButton(onPressed: () {}, icon: Icon(Icons.person)))),
+              child: SidebarButton(title: 'Login', icon: Icons.person)),
           SizedBox(
               height: 48,
-              child: Tooltip(
-                  message: 'Settings',
-                  child: IconButton(
-                      onPressed: () {}, icon: Icon(Icons.settings)))),
+              child: SidebarButton(title: 'Settings', icon: Icons.settings)),
           SizedBox(
             height: 12,
           )

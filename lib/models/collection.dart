@@ -5,11 +5,17 @@ class Collection extends PartialIndex {
   final int sortIndex;
   final String name;
   final List<HttpRequest> requests;
+  bool isExpanded = true;
 
   Collection(this.sortIndex, this.name, this.requests) : super(sortIndex);
+
+  toggleExpanded() {
+    isExpanded = !isExpanded;
+  }
 }
 
 class HttpRequest extends PartialIndex {
+  String? name;
   late int sortIndex;
   final Method method;
   final String url;
@@ -19,6 +25,7 @@ class HttpRequest extends PartialIndex {
   HttpRequest(
     this.method,
     this.url, {
+    this.name,
     this.headers,
     this.body,
     this.sortIndex = 0,

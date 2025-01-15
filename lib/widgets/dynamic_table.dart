@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:collection/collection.dart';
+import 'package:sinda/models/variable_map.dart';
 
 class DynamicTableWidget extends StatefulWidget {
   const DynamicTableWidget({super.key});
@@ -9,13 +10,14 @@ class DynamicTableWidget extends StatefulWidget {
 }
 
 class _DynamicTableWidgetState extends State<DynamicTableWidget> {
-  final List<Map<String, String>> rows = [];
+  final List<VariableMap> rows = [];
 
   @override
   void initState() {
     super.initState();
     // for heading row
-    rows.add({});
+    rows.add(VariableMap());
+    rows.add(VariableMap());
   }
 
   List<TableRow> renderRows() {
@@ -45,6 +47,7 @@ class _DynamicTableWidgetState extends State<DynamicTableWidget> {
               child: Text('Description',
                   style: TextStyle(fontWeight: FontWeight.bold)),
             ),
+            SizedBox()
           ],
         );
       }
@@ -59,6 +62,17 @@ class _DynamicTableWidgetState extends State<DynamicTableWidget> {
             alignment: Alignment.centerLeft,
             padding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
             child: TextField(
+              onChanged: (value) => {
+                if (value.isNotEmpty)
+                  {
+                    if ((rows.length - 1) == index)
+                      {
+                        setState(() {
+                          rows.add(VariableMap());
+                        })
+                      }
+                  }
+              },
               style: TextStyle(fontSize: 12),
               textAlignVertical: TextAlignVertical.center,
               decoration: InputDecoration(
@@ -91,6 +105,18 @@ class _DynamicTableWidgetState extends State<DynamicTableWidget> {
                   border: InputBorder.none),
             ),
           ),
+          SizedBox(
+            child: IconButton(
+                onPressed: () {
+                  setState(() {
+                    rows.removeAt(index);
+                  });
+                },
+                icon: Icon(
+                  Icons.delete,
+                  size: 16,
+                )),
+          )
         ],
       );
     }).toList();
@@ -107,6 +133,7 @@ class _DynamicTableWidgetState extends State<DynamicTableWidget> {
           1: FlexColumnWidth(2),
           2: FlexColumnWidth(3),
           3: FlexColumnWidth(3),
+          4: FixedColumnWidth(48),
         },
         children: renderRows());
   }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sinda/views/bloc/view_bloc.dart';
 import 'package:sinda/views/collections/bloc/collections_bloc.dart';
 import 'package:sinda/views/collections/main.dart';
 import 'package:sinda/views/collections/partial.dart';
@@ -36,11 +37,10 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   late TabController mainTabController;
-
   @override
   void initState() {
     super.initState();
-    mainTabController = TabController(length: 1, vsync: this);
+    mainTabController = TabController(length: 0, vsync: this);
   }
 
   @override
@@ -48,7 +48,10 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
     return Scaffold(
         body: MultiBlocProvider(
       providers: [
-        BlocProvider<CollectionsBloc>(create: (_) => CollectionsBloc())
+        BlocProvider<CollectionsBloc>(create: (_) => CollectionsBloc()),
+        BlocProvider<ViewBloc>(
+          create: (_) => ViewBloc(),
+        )
       ],
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -71,28 +74,36 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
               child: Column(children: [
                 SizedBox(
                     height: 50,
-                    child: TabBar(
-                        controller: mainTabController,
-                        tabAlignment: TabAlignment.start,
-                        indicatorSize: TabBarIndicatorSize.tab,
-                        labelColor: Theme.of(context).focusColor,
-                        unselectedLabelColor: Theme.of(context).disabledColor,
-                        isScrollable: true,
-                        tabs: [
-                          Tab(
-                            child: SizedBox(
-                              width: 80,
-                              child: Text(
-                                'this',
-                                style: TextStyle(fontSize: 10),
-                              ),
-                            ),
-                          )
-                        ])),
+                    child: BlocConsumer<ViewBloc, ViewState>(
+                        listener: (context, state) {
+                          setState(() {
+                            mainTabController = TabController(
+                                length: state.activeViews.length, vsync: this);
+                          });
+                        },
+                        builder: (context, state) => TabBar(
+                            controller: mainTabController,
+                            tabAlignment: TabAlignment.start,
+                            indicatorSize: TabBarIndicatorSize.tab,
+                            labelColor: Theme.of(context).focusColor,
+                            unselectedLabelColor:
+                                Theme.of(context).disabledColor,
+                            isScrollable: true,
+                            tabs: state.activeViews
+                                .map((viewData) => Tab(
+                                      child: SizedBox(
+                                        width: 80,
+                                        child: Text(
+                                          'this',
+                                          style: TextStyle(fontSize: 10),
+                                        ),
+                                      ),
+                                    ))
+                                .toList()))),
                 Expanded(
                     child: TabBarView(
                         controller: mainTabController,
-                        children: [RequestView()])),
+                        children: [ComposeRequestView()])),
               ]))
         ],
       ),

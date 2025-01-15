@@ -4,15 +4,16 @@ import 'package:sinda/models/collection.dart';
 import 'package:sinda/models/methods.dart';
 import 'package:sinda/constants/http_methods.dart';
 import 'package:sinda/views/collections/bloc/collections_bloc.dart';
+import 'package:sinda/widgets/dynamic_table.dart';
 
-class RequestView extends StatefulWidget {
-  const RequestView({super.key});
+class ComposeRequestView extends StatefulWidget {
+  const ComposeRequestView({super.key});
 
   @override
-  State<StatefulWidget> createState() => _RequestViewState();
+  State<StatefulWidget> createState() => _ComposeRequestViewState();
 }
 
-class _RequestViewState extends State<RequestView>
+class _ComposeRequestViewState extends State<ComposeRequestView>
     with TickerProviderStateMixin {
   Method _selectedMethod = httpMethods[0]; // Default method
   final GlobalKey _key = GlobalKey(); // Key for locating the button
@@ -80,21 +81,21 @@ class _RequestViewState extends State<RequestView>
                       Expanded(
                         child: SizedBox(),
                       ),
-                      DropdownButton(
+                      PopupMenuButton(
                           icon: Icon(Icons.workspaces_outlined),
-                          isDense: true,
-                          items: [
-                            DropdownMenuItem(value: 'stg', child: Text('stg')),
-                            DropdownMenuItem(value: 'prd', child: Text('prd')),
-                          ],
-                          onChanged: (value) {}),
+                          itemBuilder: (context) {
+                            return [
+                              PopupMenuItem(child: Text('stg')),
+                              PopupMenuItem(child: Text('prd')),
+                            ];
+                          }),
                       ElevatedButton.icon(
                         onPressed: () {
                           HttpRequest req = HttpRequest(_selectedMethod, '',
                               sortIndex: state.collections.length);
                           context
                               .read<CollectionsBloc>()
-                              .add(OnNewCollection(req));
+                              .add(OnNewRequest(request: req));
                         },
                         label: Text('Save'),
                         icon: Icon(Icons.save),
@@ -190,126 +191,7 @@ class _RequestViewState extends State<RequestView>
                                           textAlign: TextAlign.start,
                                           style: TextStyle(),
                                         )),
-                                    Table(
-                                        border: TableBorder.all(
-                                            color: Theme.of(context)
-                                                .secondaryHeaderColor,
-                                            borderRadius:
-                                                BorderRadius.circular(4)),
-                                        columnWidths: const {
-                                          0: FixedColumnWidth(48),
-                                          1: FlexColumnWidth(2),
-                                          2: FlexColumnWidth(3),
-                                          3: FlexColumnWidth(3),
-                                        },
-                                        children: List.generate(15, (index) {
-                                          if (index == 0) {
-                                            return TableRow(
-                                              decoration: BoxDecoration(
-                                                  borderRadius:
-                                                      BorderRadius.only(
-                                                          topLeft: Radius
-                                                              .circular(4),
-                                                          topRight:
-                                                              Radius.circular(
-                                                                  4)),
-                                                  color: Theme.of(context)
-                                                      .focusColor),
-                                              children: [
-                                                Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(4.0),
-                                                  child: Checkbox(
-                                                      value: false,
-                                                      onChanged: (value) {}),
-                                                ),
-                                                Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(8.0),
-                                                  child: Text('Key',
-                                                      style: TextStyle(
-                                                          fontWeight:
-                                                              FontWeight.bold)),
-                                                ),
-                                                Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(8.0),
-                                                  child: Text('Value',
-                                                      style: TextStyle(
-                                                          fontWeight:
-                                                              FontWeight.bold)),
-                                                ),
-                                                Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(8.0),
-                                                  child: Text('Description',
-                                                      style: TextStyle(
-                                                          fontWeight:
-                                                              FontWeight.bold)),
-                                                ),
-                                              ],
-                                            );
-                                          }
-                                          return TableRow(
-                                            children: [
-                                              Padding(
-                                                padding:
-                                                    const EdgeInsets.all(4.0),
-                                                child: Checkbox(
-                                                    value: false,
-                                                    onChanged: (value) {}),
-                                              ),
-                                              Container(
-                                                alignment: Alignment.centerLeft,
-                                                padding: EdgeInsets.symmetric(
-                                                    horizontal: 8, vertical: 6),
-                                                child: TextField(
-                                                  style:
-                                                      TextStyle(fontSize: 12),
-                                                  textAlignVertical:
-                                                      TextAlignVertical.center,
-                                                  decoration: InputDecoration(
-                                                      isDense: true,
-                                                      contentPadding:
-                                                          EdgeInsets.all(0),
-                                                      border: InputBorder.none),
-                                                ),
-                                              ),
-                                              Container(
-                                                alignment: Alignment.centerLeft,
-                                                padding: EdgeInsets.symmetric(
-                                                    horizontal: 8, vertical: 6),
-                                                child: TextField(
-                                                  style:
-                                                      TextStyle(fontSize: 12),
-                                                  textAlignVertical:
-                                                      TextAlignVertical.center,
-                                                  decoration: InputDecoration(
-                                                      isDense: true,
-                                                      contentPadding:
-                                                          EdgeInsets.all(0),
-                                                      border: InputBorder.none),
-                                                ),
-                                              ),
-                                              Container(
-                                                alignment: Alignment.centerLeft,
-                                                padding: EdgeInsets.symmetric(
-                                                    horizontal: 8, vertical: 6),
-                                                child: TextField(
-                                                  style:
-                                                      TextStyle(fontSize: 12),
-                                                  textAlignVertical:
-                                                      TextAlignVertical.center,
-                                                  decoration: InputDecoration(
-                                                      isDense: true,
-                                                      contentPadding:
-                                                          EdgeInsets.all(0),
-                                                      border: InputBorder.none),
-                                                ),
-                                              ),
-                                            ],
-                                          );
-                                        })),
+                                    DynamicTableWidget(),
                                     SizedBox(
                                       height: 24,
                                     )

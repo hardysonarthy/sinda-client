@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:sinda/models/collection.dart';
 import 'package:sinda/models/partial_index.dart';
 import 'package:sinda/views/collections/bloc/collections_bloc.dart';
+import 'package:sinda/widgets/collections/partial_tile.dart';
 
 class PartialRequest extends StatefulWidget {
   const PartialRequest({super.key});
@@ -12,6 +12,14 @@ class PartialRequest extends StatefulWidget {
 }
 
 class _PartialRequestState extends State<PartialRequest> {
+  late ScrollController _scrollController;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController();
+  }
+
   onClickNew() {
     showDialog(
         context: context,
@@ -93,10 +101,27 @@ class _PartialRequestState extends State<PartialRequest> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               SizedBox(
-                child: IconButton(
-                    visualDensity: VisualDensity.compact,
-                    padding: EdgeInsets.all(0),
-                    onPressed: onClickNew,
+                child: PopupMenuButton(
+                    offset: Offset(2, 48),
+                    itemBuilder: (context) {
+                      return [
+                        PopupMenuItem(
+                          height: 24,
+                          onTap: () {
+                            context
+                                .read<CollectionsBloc>()
+                                .add(OnNewCollection());
+                          },
+                          child: ListTile(
+                            dense: true,
+                            visualDensity: VisualDensity.compact,
+                            contentPadding: EdgeInsets.all(0),
+                            leading: Icon(Icons.folder),
+                            title: Text('New Collection'),
+                          ),
+                        )
+                      ];
+                    },
                     icon: Icon(
                       Icons.add,
                     )),
@@ -121,67 +146,18 @@ class _PartialRequestState extends State<PartialRequest> {
               builder: (context, state) {
                 if (state is CollectionsReady) {
                   return Scrollbar(
+                      controller: _scrollController,
                       child: ListView.builder(
+                          controller: _scrollController,
+                          physics: PageScrollPhysics(),
                           itemCount: state.collections.length,
                           padding: EdgeInsets.all(0),
                           itemBuilder: (context, index) {
-                            PartialIndex collection = state.collections[index];
-                            if (collection is HttpRequest) {
-                              return ListTile(
-                                dense: true,
-                                contentPadding:
-                                    EdgeInsets.symmetric(horizontal: 8),
-                                selectedColor: Theme.of(context).focusColor,
-                                onTap: () {},
-                                minLeadingWidth: 12,
-                                leading: SizedBox(
-                                    width: 36,
-                                    child: Text(
-                                      collection.method.getShortForm(),
-                                      style: TextStyle(
-                                          fontSize: 10,
-                                          color: collection.method.color),
-                                    )),
-                                title: Text(collection.url),
-                                trailing: IconButton(
-                                    onPressed: () {},
-                                    icon: Icon(
-                                      Icons.more_vert_outlined,
-                                      size: 14,
-                                    )),
-                              );
-                            }
-                            if (collection is Collection) {
-                              return ExpansionTile(
-                                title: Text(collection.name),
-                                children: collection.requests.map((req) {
-                                  return ListTile(
-                                    dense: true,
-                                    contentPadding:
-                                        EdgeInsets.symmetric(horizontal: 8),
-                                    selectedColor: Theme.of(context).focusColor,
-                                    onTap: () {},
-                                    minLeadingWidth: 12,
-                                    leading: SizedBox(
-                                        width: 36,
-                                        child: Text(
-                                          req.method.getShortForm(),
-                                          style: TextStyle(
-                                              fontSize: 10,
-                                              color: req.method.color),
-                                        )),
-                                    title: Text(req.url),
-                                    trailing: IconButton(
-                                        onPressed: () {},
-                                        icon: Icon(
-                                          Icons.more_vert_outlined,
-                                          size: 14,
-                                        )),
-                                  );
-                                }).toList(),
-                              );
-                            }
-                            return Container();
+                            PartialIndex partialTileData =
+                                state.collections[index];
+                            return PartialTile(
+                              partialTileData,
+                            );
                           }));
                 }
                 return Container();
